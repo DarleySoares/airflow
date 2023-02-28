@@ -99,6 +99,6 @@ An instance of a Task is a specific run of that task for a given DAG. They are a
 
 ## SubDAGs
 
-# Branching
+## Branching
 
 ## SLAs
