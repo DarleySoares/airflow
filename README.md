@@ -4,7 +4,10 @@ According to Apache entrerprise, Apache Airflow is a plataform created by the co
 
 The main characteristic of Airflow is **Workflows as code**, because the workflows are defined in Python code and serves several purposes: dynamic, extensible and flexible.
 
-**Airflow is not a streaming solution**
+
+<strong style="color:#EB360F">
+    Airflow is not a streaming solution.
+</strong>
 
 ## Core concepts (DAGs, DAG Runs, Tasks, Operators)
 
@@ -34,7 +37,7 @@ A **Sensor** is a special subclass of operators witch are entirely about waiting
 - **poke**: the sensor takes up a worker slot for its entire runtime.
 - **reschedule**: the sensor takes up a worker slot only when it is checking, and sleeps for a set duration between checks.
 
-A **TaskFlow** will make it much easier to author clean DAGs without extra boilerplate, all using @task decorator.
+A **TaskFlow** will make it much easier to author clean DAGs without extra boilerplate, all using <bold style="color:#EB360F">@task</bold> decorator.
 
 A DAG is created with for a set of tasks, so it has dependencies on tasks (upstream and downstream of it)
 
@@ -68,9 +71,27 @@ An instance of a Task is a specific run of that task for a given DAG. They are a
 
 ## Backfill / Catchup
 
-## DAG skeleton
+The Catchup will kick off a DAG Run for any data interval that has not been run since the last data interval (or has been cleared). When catchup turned off, the scheduller creates a DAG Run only for the latest interval.
+
+The Backfill is used when you may want run the DAG for a specified historical period. You may want to backfill the data even in the cases when catchup is disable.
 
 ## Architecture components (Web Server, Scheduler, Metadata DB, Executor, Worker)
+
+The **Workers** execute the assigned tasks.
+
+The **Scheduler** is responsible for adding the neceasary tasks to the queue.
+
+The **Web Server** is the HTTP Server provides access to DAG/task status information.
+
+The **Database** contains information about the status of tasks, DAGs, Variables, connections, etc.
+
+The **Executors** are the mechanism by with task instance get run. They have a common API and are "pluggable", meaning you can swap executors based on your installation needs. There are two types of executor: locally and remotely.
+
+
+![Architecture_Celery](/img/architecture_celery.png)
+
+![Architecture_Kubernetes](/img/architecture_kubernetes.png)
+
 
 
 
