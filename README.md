@@ -93,33 +93,177 @@ The **Executors** are the mechanism by with task instance get run. They have a c
 ![Architecture_Kubernetes](/img/architecture_kubernetes.png)
 
 
-
-
-## What Airflow is and what Airflow is not
-
-
-
-
 ## Variables
 
-## Pools
+Variables are runtime configurationm concept, a general key/value store that is global and can be queried from your tasks. To use
 
-## Trigger Rules
+```python
+from airflow.models import Variable
 
-## DAG Dependencies
+value = Variable.get("variable_name")
 
-## Idempotency
+value = "{{ var.value.variable_name }}"
+```
 
-## Dynamic DAGs
+**PS:** if there is *_secret* in the variable name, the value is hidden.
+
+The template engine is powerfull because the connection with database is fetched only once the DAG is running, but using a Variable the connection is created every 30 seconds.
+
+To create environment variables in Airflow it's needed add in dockerfile
+
+```dockerfile
+AIRFLOW_VAR_VARIABLE_NAME="variable_value"
+```
 
 ## Templanting
 
-## TaskFlow API
+Variables, macros and filters can be used in templates.+
+
+```python
+
+{{ ds }}: str, # the DAG run's logical date as YYYY-MM-DD
+{{ data_interval_start}}: pendulum.DateTime # start of the data interval
+{{ data_interval_end}}: pendulum.DateTime # end of the data interval 
+```
 
 ## XCOMs
 
+XComs (cross communications) are a mechanism that lat tasks talk to each other, as by default tasks are entirely isolated an may be running on entirely different machines.
+XComs are explicity (pushed and pulled to/from) with **xcom_push** and **xcom_pull** methods.
+
+```python
+# XCom pull
+value = task_intance.xcom_pull(task_ids="pushing_task")
+
+SELECT * FROM {{ task_instance.xcom_pull(task_ids="foo", key="table_name")}}
+```
+
+With SQLite are limited to 2GB for a given XCom, Postgres are limited 1GB and MySQL are limited to 64kB.
+
+## TaskFlow API
+
+**Decorators**: help you in order to create dags in an easier and faster way.
+**XCom args**: allow you to share data between your tasks.
+
+```python
+from airflow.operator.python import PythonOperator
+
+def process(ti):
+    return 'end'
+
+process = PythonOperator(task_id="process", python_callable=process)
+
+process
+# ----
+from airflow.decorators import task
+
+@task.python
+def process():
+    return 'end'
+
+process()
+
+```
+
 ## SubDAGs
+
+SubDAGs are a legacy Airflow feature that allowed the creation of reusable task patterns in DAGs and are deprecated in Airflow 2.0. It's recommended you don't use SubDAGs, use the following alternatives: task groups or cross-dag-dependencies.
+
+## Task Groups
+
+Task Groups are used to organize tasks in the Airflow UI DAG graph view.
+
+```python
+from airflow.utils.task_group import TaskGroup
+
+initial_task = extract()
+
+with TaskGroup(group_id="process_tasks") as process_tasks:
+    process_a()
+    process_b()
+    process_c()
+
+# ----
+from airflow.decorators import task, task_group
+
+@task_group(group_id="process_tasks")
+def process_tasks()
+    process_a()
+    process_b()
+    process_c()
+```
+## Dynamic DAGs
+
+```python
+partners = {
+    "A": {"name": "partner_a"},
+    "B": {"name": "partner_b"},
+    "C": {"name": "partner_c"},
+}
+
+@task_group(group_id="process_tasks", add_suffix_on_collision=True)
+def process_tasks()
+    process_a()
+    process_b()
+    process_c()
+
+for partner, details in partnes.items():
+
+    @task.python(task_id=f"extract_{partner}", do_xcom_push=False, multiple_outputs=True)
+    def extract(partner)
+        return partner   
+
+    process_tasks(extract(details["name"]))
+```
 
 ## Branching
 
+```python
+from airflow.operators.python import BranchPythonOperator
+
+def _choosing_partner(execution_date):
+    day = execution_date.day_of_week
+
+    if day == 1:
+        return  "extract_partner_A"
+    if day == 2:
+        return  "extract_partner_B"
+    else
+        return  "extract_partner_C "
+
+choosing_partner = BranchPythonOperator(
+    task_id="choosing_partner",
+    python_callable=_choosing_partner
+)
+
+choosing_partner >> process_tasks
+```
+
+## Trigger Rules
+
+```python
+from airflow.utils.trigger_rule import TriggerRule
+
+all_sucess
+all_failed
+all_done
+one_failed
+one_sucess
+none_failed
+none_failed_min_one_sucess
+none_skipped
+none_failed_or_skipped
+```
+
+## Pools
+
+## Idempotency
+
+
+
+
+
 ## SLAs
+
+
+## DAG Dependencies
