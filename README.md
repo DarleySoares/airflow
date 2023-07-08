@@ -138,6 +138,8 @@ With SQLite are limited to 2GB for a given XCom, Postgres are limited 1GB and My
 
 ## TaskFlow API
 
+The TaskFlow API is a new Airflow feature that allows you to explicity declare message passing while implicity declaring task dependencies. For that, XCom Args was abstracted and inferred as result of the Python function invocation,  task decorators that automatically creates PythonOperator tasks and handles variable passing were implemented and supports for custom Xcom backends.
+
 **Decorators**: help you in order to create dags in an easier and faster way.
 
 ```python
@@ -196,6 +198,8 @@ initial_task >> process_tasks
 ```
 
 ## Dynamic DAGs
+
+It's possible create many DAG's automatically using Dynamic DAGs context. For that, it's common use dictonary to help.
 
 ```python
 partners = {
