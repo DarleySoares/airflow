@@ -225,6 +225,8 @@ for partner, details in partnes.items():
 
 ## Branching
 
+When designing your data pipelines, you may encounter use cases that require more complex task flows. For example, you may havea use case where you need to decide between multiple tasks to execute based on the results of an upstream taks, for that has multiple options for building conditional logic or branching, with: BranchPythonOperator and ShortCircuitOperator.
+
 ```python
 from airflow.operators.python import BranchPythonOperator
 
@@ -248,16 +250,13 @@ choosing_partner >> process_tasks
 
 ## Trigger Rules
 
-```python
-from airflow.utils.trigger_rule import TriggerRule
+Trigger Rules determine whn a task will be executed.
 
-all_sucess
-all_failed
-all_done
-one_failed
-one_sucess
-none_failed
-none_failed_min_one_sucess
-none_skipped
-none_failed_or_skipped
-```
+- **all_sucess**: task gets triggered when all upstream tasks have succeeded.
+- **all_failed**: task gets triggered when all upstream tasks have failed.
+- **all_done**: task gets triggered once all upstream tasks ared done with their execution whatever their state.
+- **one_failed**: task gets triggered as soon as one of the upstream tasks fails.
+- **one_sucess**: taks gets triggered as soon as one of the upstream tasks succeeds.
+- **none_failed**: task gets triggered if all upstream tasks have succeeded or been skipped.
+- **none_failed_min_one_sucess | none_failed_or_skipped**: tasks gets triggered if all upstream tasks haven't failed and at least one has succeeded.
+- **none_skipped**: tasks gets triggered if no upstream tasks are skipped.
