@@ -18,8 +18,8 @@ def show_hour(ts, **kwargs) -> str:
     return f"SYSTEM HOUR: {ts} | RANDOM HOUR: {kwargs['hour']}"
 
 
-def branching(ti):
-    hour = ti.xcom_pull(task_ids=['random_hour'], key='hour')
+def branching(**kwargs):
+    hour = int(kwargs["hour"])
     
     if hour >= 0 and hour < 12:
         return "good_morning"
@@ -42,7 +42,7 @@ def good_night(ds, **kwargs) -> str:
 
 @dag(
     dag_id = "dag_xcom",
-    start_date = datetime(2023, 10, 20),
+    start_date = datetime(2023, 10, 1),
     schedule = "0 21 * * *",
     default_args = default_args,
     catchup = True,
@@ -70,8 +70,7 @@ def generate_dag():
         task_id="branching",
         python_callable=branching,
         provide_context=True,
-        op_kwargs={
-            "hour": "{{ ti.xcom_pull(task_ids=['random_hour'], key='hour')[0] }}"}
+        op_kwargs={"hour": "{{ ti.xcom_pull(task_ids=['random_hour'], key='hour')[0] }}"}
     )
     
     option_1 = PythonOperator(
