@@ -17,10 +17,12 @@ def good_night(**kwargs) -> str:
 
 @dag(
     dag_id = "dag_3",
-    start_date = datetime(2023, 1, 1),
+    start_date = datetime(2023, 10, 16),
     schedule = "0 21 * * *",
     default_args = default_args,
-    catchup = False,
+    catchup = True,
+    max_active_runs=2,
+    max_active_tasks=3,
     tags=["good_nigth", "daily"]
 )
 def generate_dag():

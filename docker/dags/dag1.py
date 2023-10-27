@@ -17,10 +17,10 @@ def good_morning(ds, **kwargs) -> str:
 
 dag = DAG(
     dag_id="dag_1",
-    start_date=datetime(2023, 1, 1),
+    start_date=datetime(2023, 10, 1),
     schedule="0 9 * * *",
     default_args=default_args,
-    catchup=False,
+    catchup=True,
     tags=["good_morning", "daily"]
 )
 

@@ -18,9 +18,12 @@ def good_afternoon(ds, **kwargs) -> str:
 with DAG(
     dag_id = "dag_2",
     start_date = datetime(2023, 1, 1),
+    end_date= datetime(2023, 1, 25),
     schedule = "0 13 * * *",
     default_args = default_args,
-    catchup = False,
+    catchup = True,
+    max_active_runs=1,
+    max_active_tasks=1,
     tags=["good_afternoon", "daily"]
 ):
     task_1 = BashOperator(
