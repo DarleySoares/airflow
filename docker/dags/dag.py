@@ -72,7 +72,7 @@ default_args: Dict[str, str] = {
 
 @dag(
     dag_id="dag_machine_learning",
-    start_date=datetime(2023, 10, 23),
+    start_date=datetime(2023, 10, 1),
     schedule="0 9 * * *",
     default_args=default_args,
     catchup=True,
